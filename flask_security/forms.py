@@ -253,7 +253,7 @@ class LoginForm(Form, NextFormMixin):
 class OtpForm(Form, NextFormMixin):
     """The default otp form"""
     email = HiddenField()
-    token = StringField(get_form_field_label('otp'), validators=[otp_required(), otp_length()])
+    token = StringField(get_form_field_label('otp'), validators=[otp_required, otp_length])
     submit = SubmitField(get_form_field_label('submit'))
 
     def __init__(self, *args, **kwargs):
