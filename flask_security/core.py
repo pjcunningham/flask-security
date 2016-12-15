@@ -175,10 +175,12 @@ _default_messages = {
         'Please log in to access this page.', 'info'),
     'REFRESH': (
         'Please reauthenticate to access this page.', 'info'),
-    'OTP_NOT_PROVIDED': (
+    'OTP_TOKEN_NOT_PROVIDED': (
         'OTP not provided', 'error'),
-    'OTP_INVALID_LENGTH': (
+    'OTP_TOKEN_INVALID_LENGTH': (
         'OTP must be exactly 6 characters', 'error'),
+    'OTP_TOKEN_INVALID': (
+        'Invalid OTP token', 'error'),
 
 }
 
