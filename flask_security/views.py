@@ -90,6 +90,31 @@ def login():
                                      login_user_form=form,
                                      **_ctx('login'))
 
+@anonymous_user_required
+def otp():
+    """View function for otp view"""
+
+    form_class = _security.otp_form
+
+    if request.json:
+        form = form_class(MultiDict(request.json))
+    else:
+        form = form_class()
+
+    if form.validate_on_submit():
+
+        login_user(form.user, remember=form.remember.data)
+        after_this_request(_commit)
+
+        if not request.json:
+            return redirect(get_post_login_redirect(form.next.data))
+
+    if request.json:
+        return _render_json(form, include_auth_token=True)
+
+    return _security.render_template(config_value('OTP_USER_TEMPLATE'),
+                                     otp_form=form,
+                                     **_ctx('otp'))
 
 def logout():
     """View function which handles a logout request."""
