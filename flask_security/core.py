@@ -343,6 +343,10 @@ class OtpUserMixin(UserMixin):
         """Returns `True` if the user is otp enabled."""
         return self.otp_enabled
 
+    def is_otp_valid(self, token):
+        """Returns `True` if the token is a valid otp."""
+        return self.verify_otp(token)
+
 
 class AnonymousUser(AnonymousUserMixin):
     """AnonymousUser definition"""
