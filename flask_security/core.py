@@ -24,7 +24,7 @@ from .utils import config_value as cv, get_config, md5, url_for_security, string
 from .views import create_blueprint
 from .forms import LoginForm, ConfirmRegisterForm, RegisterForm, \
     ForgotPasswordForm, ChangePasswordForm, ResetPasswordForm, \
-    SendConfirmationForm, PasswordlessLoginForm
+    SendConfirmationForm, PasswordlessLoginForm, OtpForm
 
 # Convenient references
 _security = LocalProxy(lambda: current_app.extensions['security'])
@@ -173,6 +173,11 @@ _default_messages = {
         'Please log in to access this page.', 'info'),
     'REFRESH': (
         'Please reauthenticate to access this page.', 'info'),
+    'OTP_NOT_PROVIDED': (
+        'OTP not provided', 'error'),
+    'OTP_INVALID_LENGTH': (
+        'OTP must be exactly 6 characters', 'error'),
+
 }
 
 _default_forms = {
@@ -184,6 +189,7 @@ _default_forms = {
     'change_password_form': ChangePasswordForm,
     'send_confirmation_form': SendConfirmationForm,
     'passwordless_login_form': PasswordlessLoginForm,
+    'otp_form': OtpForm,
 }
 
 
@@ -325,6 +331,15 @@ class UserMixin(BaseUserMixin):
             return role in self.roles
 
 
+class OtpUserMixin(UserMixin):
+    """Mixin for OTP `User` model definitions"""
+
+    @property
+    def is_otp_enabled(self):
+        """Returns `True` if the user is otp enabled."""
+        return self.otp_enabled
+
+
 class AnonymousUser(AnonymousUserMixin):
     """AnonymousUser definition"""
 
@@ -361,6 +376,9 @@ class _SecurityState(object):
 
     def login_context_processor(self, fn):
         self._add_ctx_processor('login', fn)
+
+    def otp_context_processor(self, fn):
+        self._add_ctx_processor('otp', fn)
 
     def register_context_processor(self, fn):
         self._add_ctx_processor('register', fn)
@@ -401,7 +419,7 @@ class Security(object):
             self._state = self.init_app(app, datastore, **kwargs)
 
     def init_app(self, app, datastore=None, register_blueprint=True,
-                 login_form=None, confirm_register_form=None,
+                 login_form=None, otp_form=None, confirm_register_form=None,
                  register_form=None, forgot_password_form=None,
                  reset_password_form=None, change_password_form=None,
                  send_confirmation_form=None, passwordless_login_form=None,
@@ -425,6 +443,7 @@ class Security(object):
 
         state = _get_state(app, datastore,
                            login_form=login_form,
+                           otp_form=otp_form,
                            confirm_register_form=confirm_register_form,
                            register_form=register_form,
                            forgot_password_form=forgot_password_form,

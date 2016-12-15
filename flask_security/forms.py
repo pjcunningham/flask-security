@@ -36,7 +36,9 @@ _default_field_labels = {
     'retype_password': 'Retype Password',
     'new_password': 'New Password',
     'change_password': 'Change Password',
-    'send_login_link': 'Send Login Link'
+    'send_login_link': 'Send Login Link',
+    'otp': 'One Time Password',
+    'submit': 'Submit'
 }
 
 
@@ -67,6 +69,8 @@ email_required = Required(message='EMAIL_NOT_PROVIDED')
 email_validator = Email(message='INVALID_EMAIL_ADDRESS')
 password_required = Required(message='PASSWORD_NOT_PROVIDED')
 password_length = Length(min=6, max=128, message='PASSWORD_INVALID_LENGTH')
+otp_required = Required(message='TOKEN_NOT_PROVIDED')
+otp_length = Length(min=6, max=6, message='TOKEN_INVALID_LENGTH')
 
 
 def get_form_field_label(key):
@@ -244,6 +248,26 @@ class LoginForm(Form, NextFormMixin):
             self.email.errors.append(get_message('DISABLED_ACCOUNT')[0])
             return False
         return True
+
+
+class OtpForm(Form, NextFormMixin):
+    """The default otp form"""
+
+    token = StringField(get_form_field_label('otp'), validators=[otp_required(), otp_length()])
+    submit = SubmitField(get_form_field_label('submit'))
+
+    def __init__(self, *args, **kwargs):
+        super(OtpForm, self).__init__(*args, **kwargs)
+        if not self.next.data:
+            self.next.data = request.args.get('next', '')
+
+    def validate(self):
+        if not super(OtpForm, self).validate():
+            return False
+
+        if self.token.data.strip() == '':
+            self.token.errors.append(get_message('TOKEN_NOT_PROVIDED')[0])
+            return False
 
 
 class ConfirmRegisterForm(Form, RegisterFormMixin,

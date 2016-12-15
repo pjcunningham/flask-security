@@ -73,6 +73,10 @@ def login():
         form = form_class()
 
     if form.validate_on_submit():
+
+        if form.user.is_otp_enabled:
+            redirect()
+
         login_user(form.user, remember=form.remember.data)
         after_this_request(_commit)
 
