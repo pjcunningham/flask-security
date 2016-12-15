@@ -75,7 +75,7 @@ def login():
     if form.validate_on_submit():
 
         if form.user.is_otp_enabled:
-            redirect(config_value('OTP_URL'))
+            return redirect(config_value('OTP_URL'))
 
         login_user(form.user, remember=form.remember.data)
         after_this_request(_commit)
