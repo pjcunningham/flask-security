@@ -69,8 +69,8 @@ email_required = Required(message='EMAIL_NOT_PROVIDED')
 email_validator = Email(message='INVALID_EMAIL_ADDRESS')
 password_required = Required(message='PASSWORD_NOT_PROVIDED')
 password_length = Length(min=6, max=128, message='PASSWORD_INVALID_LENGTH')
-otp_required = Required(message='TOKEN_NOT_PROVIDED')
-otp_length = Length(min=6, max=6, message='TOKEN_INVALID_LENGTH')
+otp_required = Required(message='OTP_TOKEN_NOT_PROVIDED')
+otp_length = Length(min=6, max=6, message='OTP_TOKEN_INVALID_LENGTH')
 
 
 def get_form_field_label(key):
@@ -252,7 +252,7 @@ class LoginForm(Form, NextFormMixin):
 
 class OtpForm(Form, NextFormMixin):
     """The default otp form"""
-
+    email = HiddenField()
     token = StringField(get_form_field_label('otp'), validators=[otp_required(), otp_length()])
     submit = SubmitField(get_form_field_label('submit'))
 
@@ -266,7 +266,13 @@ class OtpForm(Form, NextFormMixin):
             return False
 
         if self.token.data.strip() == '':
-            self.token.errors.append(get_message('TOKEN_NOT_PROVIDED')[0])
+            self.token.errors.append(get_message('OTP_TOKEN_NOT_PROVIDED')[0])
+            return False
+
+        self.user = _datastore.get_user(self.email.data)
+
+        if not self.user.is_valid_otp(self.token.data):
+            self.token.errors.append(get_message('OTP_TOKEN_INVALID')[0])
             return False
 
 
