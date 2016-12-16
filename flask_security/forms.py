@@ -275,6 +275,8 @@ class OtpForm(Form, NextFormMixin):
             self.token.errors.append(get_message('OTP_TOKEN_INVALID')[0])
             return False
 
+        return True
+
 
 class ConfirmRegisterForm(Form, RegisterFormMixin,
                           UniqueEmailFormMixin, NewPasswordFormMixin):
