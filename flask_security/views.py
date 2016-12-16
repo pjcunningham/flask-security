@@ -90,6 +90,7 @@ def login():
                                      login_user_form=form,
                                      **_ctx('login'))
 
+
 @anonymous_user_required
 def otp():
     """View function for otp view"""
