@@ -102,7 +102,8 @@ _default_config = {
         # And always last one...
         'plaintext'
     ],
-    'DEPRECATED_PASSWORD_SCHEMES': ['auto']
+    'DEPRECATED_PASSWORD_SCHEMES': ['auto'],
+    'OTP_ENABLED': False
 }
 
 #: Default Flask-Security messages
