@@ -253,13 +253,9 @@ class LoginForm(Form, NextFormMixin):
 class OtpForm(Form, NextFormMixin):
     """The default otp form"""
     email = HiddenField()
+    remember = HiddenField()
     token = StringField(get_form_field_label('otp'), validators=[otp_required, otp_length])
     submit = SubmitField(get_form_field_label('submit'))
-
-    def __init__(self, *args, **kwargs):
-        super(OtpForm, self).__init__(*args, **kwargs)
-        if not self.next.data:
-            self.next.data = request.args.get('next', '')
 
     def validate(self):
         if not super(OtpForm, self).validate():
@@ -271,7 +267,11 @@ class OtpForm(Form, NextFormMixin):
 
         self.user = _datastore.get_user(self.email.data)
 
-        if not self.user.is_valid_otp(self.token.data):
+        if self.user is None:
+            self.email.errors.append(get_message('USER_DOES_NOT_EXIST')[0])
+            return False
+
+        if not self.user.is_otp_valid(self.token.data):
             self.token.errors.append(get_message('OTP_TOKEN_INVALID')[0])
             return False
 
